@@ -100,3 +100,10 @@ ols
 
 p <- qplot(x,y, data=hubble, xlab="Distance", ylab="Velocity")
 p  + geom_abline(intercept = 0, slope=ols$coef[1])
+
+#담배가격과 판매량
+install.packages("Ecdat")
+data(Cigar,package="Ecdat")
+names(Cigar)
+sum(Cigar$year==90)
+lm(log(sales)~log(price),data=Cigar,subset=year==90)
