@@ -1,0 +1,102 @@
+# 환경 쿠즈네츠 곡선 가설
+url <- "http://econ.korea.ac.kr/~chirokhan/book/data/co2gdp2005.csv"
+ekc <- read.csv(url)
+datadir <- "http://econ.korea.ac.kr/~chirokhan/book/data"
+ekc <- read.csv(file.path(datadir,"co2gdp2005.csv"))
+names(ekc)
+nrow(ekc)
+head(ekc)
+summary(ekc)
+plot(co2pc~gdppcppp,data = ekc)
+
+# 우리나라 군별 공무원수와 재정자립도
+datadir <- "http://econ.korea.ac.kr/~chirokhan/book/data"
+serv <- read.csv(file.path(datadir, "serv.csv"))
+nrow(serv)
+summary(serv)
+plot(finind~servpc,data=serv,subset=servpc<28)
+
+#교육수준과 임금
+datadir <- "http://econ.korea.ac.kr/~chirokhan/book/data"
+klips <- read.csv(file.path(datadir, 'klips11subset.csv'))
+klips <- subset(klips, regular==1 & married==1)
+nrow(klips)
+summary(klips)
+plot(labinc~educ, data=klips, log='y')
+plot(log(labinc)~educ, data=klips)
+klips$mloginc <- with(klips, ave(log(labinc), educ, FUN=mean))
+points(mloginc~educ, data=klips, pch=19, cex=2)
+
+#최소제곱법
+install.packages("quantreg")
+library(quantreg)
+serv1 <- serv[serv$servpc<28,]
+plot(finind~servpc,data=serv1,pch=19)
+abline(lm(finind~servpc,data=serv1),lty=1)
+abline(rq(finind~servpc,data=serv1),lty=2)
+
+#공무원 비율과 재정자립도[OLS]
+datadir <- "http://econ.korea.ac.kr/~chironkhan/book/data"
+serv <- read.csv(file.path(datadir,"serv.csv"))
+serv1 <- serv[serv$servpc<28,]
+nrow(serv1)
+lm(log(finind)~log(servpc),data=serv1)
+plot(log(finind)~log(servpc),data=serv1)
+abline(lm(log(finind)~log(servpc),data=serv1))
+
+#교육수준과 연간 근로소득[OLS]
+datadir <- "http://econ.korea.ac.kr/~chirokhan/book/data"
+kilps <- read.csv(file.path(datadir,'klips11subset.csv'))
+ols <- lm(log(labinc)~educ, data=klips)
+ols
+plot(log(labinc)~educ, data=klips)
+abline(ols)
+
+#고령인구비율과 흡연율[OLS]
+datadir <- "http://econ.korea.ac.kr/~chirokhan/book/data"
+Death <- read.csv(file.path(datadir,"deathrate.csv"))
+reg <- lm(smoke~aged, data=Death, subset=year==2010)
+reg
+plot(smoke~aged, data=Death, subset=year==2010)
+abline(reg)
+
+#소비함수[OLS]
+install.packages("Ecdat")
+library(Ecdat)
+data(Consumption,package="Ecdat")
+head(Consumption)
+summary(Consumption)
+nrow(Consumption)
+colnames(Consumption)
+lm(ce~yd,data=Consumption)
+plot(ce~yd,data=Consumption,pch=19)
+abline(lm(ce~yd,data=Consumption))
+
+#유전학과 골턴의 "회귀"
+install.packages("HistData")
+library(HistData)
+datadir <- "http://econ.korea.ac.kr/~chirokhan/book/data"
+GaltonPar <- read.csv(file.path(datadir, "galtonpar.csv"))
+plot(avgsonht~midparht, data=GaltonPar)
+abline(0,1,lty=2)
+reg <- (lm(avgsonht~midparht, data=GaltonPar))
+reg
+nobs(reg)
+plot(avgsonht~midparht, data=GaltonPar)
+abline(0,1,lty=2)
+abline(reg)
+lm(avgdtrht~midparht, data=GaltonPar)
+
+#우주의 나이
+install.packages("gamair")
+data(hubble,package="gamair")
+hubble[1:5,]
+plot(y~x, data=hubble, xlab="Distance", ylab="Velocity")
+install.packages("ggplot2")
+library(ggplot2)
+qplot(x,y, data=hubble, xlab="Distance", ylab="Velocity")
+ols <- lm(y~x-1,data=hubble)
+ols
+
+p <- qplot(x,y, data=hubble, xlab="Distance", ylab="Velocity")
+p  + geom_abline(intercept = 0, slope=ols$coef[1])
