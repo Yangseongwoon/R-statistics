@@ -1,0 +1,57 @@
+### Assignment 1 ###
+### Problem set 1
+## 데이터 분석 환경 설정
+setwd("/Users/yangseongwoon/Desktop/DataForHW1")
+dir()
+## 엑셀자료를 불러오기 위한 readxl 패키지 설치
+install.packages("readxl")
+library(readxl) #엑셀파일 라이브러리 
+#ceosal2을 col_names을 F로 두면서 엑셀 파일의 첫번째 행을 변수명으로 인식하는 것을 방지 => 관찰 값 소실을 방지
+ceosal2 = read_excel("ceosal2.xls", col_names = F)
+ceosal2
+#결측치 점검
+complete.cases(ceosal2)
+is.na(ceosal2)
+#observations 확인
+nrow(ceosal2)
+#변수명 할당
+colnames(ceosal2) = c("salary", "age", "college", "grad", "comten", "ceoten", "sales", "profits", "mktval", "lsalary", "lsales", "lmktval", "comtensq",  "ceotensq",  "profmarg")
+## Answer sheet 1
+# 평균 연봉
+mean(ceosal2$salary)
+# 평균 years as ceo with company
+mean(ceosal2$ceoten)
+# $ 등 코드의 복잡성을 줄이기 위해 attach함수 활용 후 평균 연봉과 평균 tenure
+attach(ceosal2)
+mean(salary)
+mean(ceoten)
+
+## Answer sheet 2
+## Data Preprocessing
+## data 전처리를 위한 패키지 dplyr 설치
+install.packages("dplyr")
+library(dplyr)
+# 파이프 오퍼레이터를 활용한 ceoten이 0인 조건 추출 후 summarise의 빈도 함수를 통하여 도출
+ceosal2 %>%  filter(ceoten == 0) %>% summarise(n = n())
+
+## the logest tenture 찾기
+# (1) 원시적인 방법:내림차순 정렬로(높은 값에서 낮은 값 순으로) the longest tenure 찾기
+ceosal2 %>% arrange(desc(ceoten))
+# (2) dplyr 패키지의 select함수를 활용하여 summary 구하기
+summary_ceoten <- ceosal2 %>% select(ceoten)
+summary_ceoten
+summary(summary_ceoten)
+# (3)앞에서 attach(ceosal2) 실행했으니 바로 max(ceoten)으로 추출하기
+max(ceoten)
+# (4) others
+max(ceosal2$ceoten)
+
+## Answer sheet 3
+# simple linear regression model 종속변수 log(salary) ~ 독립변수 ceoten
+# log(salary)와 ceonten의 함수를 sal_ten으로 할당
+sal_ten <- lm(log(salary)~ceoten, ceosal2)
+sal_ten
+# coefficient : 회귀식을 실행했을 때보다 coef함수를 사용하면 비교적 좀더 자세하게 수치가 나옴
+coef(sal_ten)
+# summary를 통한 모델 평가 방법
+summary(sal_ten)
