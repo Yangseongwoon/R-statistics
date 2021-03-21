@@ -1,0 +1,51 @@
+### Problem set 2
+## Background Environment setting
+getwd()
+setwd("/Users/yangseongwoon/Desktop/DataForHW1")
+dir()
+## Read Excel by library
+library(readxl)
+# "401k.xls" is allocated to k
+k <- read_excel("401k.xls", col_names = F)
+k
+# checking missing value
+complete.cases(k)
+is.na(k)
+# # of row in k
+nrow(k)
+# Review 401K_description
+txt <- readLines("401K_description.txt", n = 3)
+txt
+# Only copy & past three line
+title = c("prate     mrate     totpart   totelg    age       totemp    sole      ltotemp")
+
+# install for removing unnecessary spacing words
+install.packages("stringr")
+library(stringr)
+
+# remove spacing words and name title_cle[title cleaned]
+title_cln <- str_squish(title)
+title_cln
+
+# Variable names are allocated to title_cln vector
+colnames(k) = c("prate", "mrate", "totpart", "totelg", "age", "totemp", "sole", "ltotemp")
+# attach k for convenient calculation
+attach(k)
+## answer sheet 1
+# The average participation & The average match
+mean(prate)
+mean(mrate)
+
+## answer sheet 2 & 3 & 5
+# prate ~ mrate simple linear regression
+pr_mr <- lm(prate~mrate, k)
+pr_mr
+summary(pr_mr)
+
+## answer sheet 4
+# point estimation
+predict(pr_mr, newdata = data.frame(mrate=3.5))
+# interval estimation
+predict(pr_mr, newdata = data.frame(mrate=3.5), interval="confidence")
+# confidence interval with errors
+predict(pr_mr, newdata = data.frame(mrate=3.5), interval = "prediction")
