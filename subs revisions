@@ -1,0 +1,76 @@
+## assignment 3
+
+##(1) 데이터 분석 환경 설정 -> (2) 데이터 탐색 -> (3)데이터 클랜징(전처리) -> (4) 데이터 분석 
+
+#-------- (1) 데이터 분석 환경 설정 --------
+# Working Background Setting
+getwd()
+setwd("/Users/yangseongwoon/Desktop/DataForHW1")
+
+# checking directory
+dir()
+
+# read excel
+install.packages("readxl")
+library(readxl)
+
+# importing excel file
+ksubs = read_excel("401ksubs.xls", col_names = F)
+ksubs
+# ---------(2) 데이터 탐색 ----------
+nrow(ksubs)
+head(ksubs)
+tail(ksubs)
+summary(ksubs)
+#-------- 변수명 지정(R의 기능을 다양하게 쓰기 위하여 해봄) ---------
+title = c("e401k     inc       marr      male      age       fsize     nettfa    p401k    pira      incsq     agesq")
+title
+# 변수명 정리를 위한 stringr 패키지 설치 및 라이브러리 
+install.packages("stringr")
+library("stringr")
+# 변수명 사이에 빈공간 정리
+title_cln <-str_squish(title)
+title_cln
+# 변수명 부여
+colnames(ksubs) = c("e401k", "inc", "marr", "male", "age", "fsize", "nettfa", "p401k", "pira", "incsq", "agesq")
+# 변수명 부여 됐는지 확인  -> data에서 ksubs 클릭 후 변수명이 잘 지정되었는지 확인
+
+
+# checking missing value
+# complete.cases 결측치가 없으면 TRUE, 결측치가 있으면 FALSE 
+complete.cases(ksubs)
+# 결측치가 없는 데이터의 합 9275
+sum(complete.cases(ksubs)) 
+# !complete.cases 결측치가 있으면 TRUE, 결측치가 없으면 FALSE
+!complete.cases(ksubs)
+sum(!complete.cases(ksubs)) 
+# 결측치가 na인지 여부 반환 na인 경우 TRUE, 아닌 경우 False
+is.na(ksubs)
+# 결측치가 na인 경우 합 = 0 
+sum(is.na(ksubs))
+## 결측치 검정을 통해서 결측치가 없는 것으로 나타남
+
+# ----------(3) 데이터 클랜징
+# attach함수 데이터를 R검색 경로에 추가하여 변수명으로 바로 접근가능하게 함
+attach(ksubs)
+# 데이터 추출 (효율적 데이터 핸들링을 위하여 dplyr 패키지 설치)
+install.packages("dplyr")
+library(dplyr)
+# ----------(4) 데이터 분석
+# marr=1이면서 fsize=2 인 조건 충족하는 경우
+couplewithoutchild <- ksubs %>% filter(marr == 1 & fsize == 2)
+couplewithoutchild
+couplewithoutchild %>% summarise(n=n())
+
+# Multiple Linear Regression
+model <- lm(nettfa ~ inc + age)
+model
+summary(model)
+
+# confidence interval 95% 신뢰구간
+confint(model, level = 0.95)
+# 1% significant level
+# B2 =1 or B2 != 1
+t.test(age, var.equal=T, mu=1, alt ='two.sided', conf.level = 0.99)
+# B2 = 1 or B2 > 1
+t.test(age, var.equal=T, mu=1, alt ='greater', conf.level = 0.99)
